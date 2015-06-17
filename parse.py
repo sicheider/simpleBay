@@ -57,8 +57,72 @@ def advanced_search():
 
 
 class Project():
-  def __init__(self, name):
+  """Create instances of distinct search projects."""
+  def __init__(self, name, place):
     self.name = name
+    self.place = place
+
+  def syncAds(self):
+    """Synchronize ads of current project.
+
+    Add new ads in empty project or updates already saved ads.
+    """
+    pass
+
+  def markAd(self):
+    """Mark an ad based on its ID."""
+    pass
+
+  def deletedAd(self, id):
+    """Remove ad from currrent project."""
+    pass
+
+  def saveProject(self):
+    """Saves the project to disk."""
+    # TODO: -add save-to location
+    #       -request project name (e.g. from self.name)
+    #       -append timestamp to distinguish same-named projects
+    pass
+
+  def loadProject(self):
+    """Retrieve Project from disk."""
+    pass
+
+
+class Ad():
+  """Contains infromations about specific ads."""
+  def __init__(self, name, id, link):
+    self.name = name
+    self.id = id
+    self.link = link
+
+  def adDeleted(self):
+    """Mark ad for removal."""
+    #TODO: pass boolean and remove ad in exit-method if True.
+    pass
+
+  def adMarked(self):
+    """Set marked flag."""
+    pass
+
+  def adNew(self):
+    """Set new flag."""
+    pass
+
+
+class SearchItem():
+  """Do the actual search on the Website and parse results."""
+  def __init__(self, name, distance, number=None, minPrice=None, maxPrice=None):
+    self.name = name
+    self.distance = distance
+    self.number_of_requests = number
+    self.minPrice = minPrice
+    self.maxPrice = maxPrice
+
+  def requestSearch(self):
+    """Request results from the search field."""
+    # TODO: implement with get_ad_page_urls()
+    pass
 
 
 #--------------------------------   BOILERPLATE   ------------------------------
