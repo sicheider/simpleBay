@@ -1,5 +1,8 @@
-# temp files:
+# Temp files:
 .*.sw[p,o]
+
+# Rope
+.ropeproject
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

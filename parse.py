@@ -56,6 +56,11 @@ def advanced_search():
   return search_string.split('?')[-1].split('&')
 
 
+class Project():
+  def __init__(self, name):
+    self.name = name
+
+
 #--------------------------------   BOILERPLATE   ------------------------------
 if __name__ == '__main__':
   main()
