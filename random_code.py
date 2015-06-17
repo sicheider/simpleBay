@@ -47,13 +47,52 @@ def main():
 #----------------------------
 #- XXX under construction XXX
 #----------------------------
-def advanced_search():
+class SearchItem():
+  pass
+
+
+class parser():
+  def __init__(self):
+    #self.search_fields = SearchItem.fields()
+
+
+    self.keywords = keywords
+    self.categoryId = ''
+    self.locationStr = ''
+    self.locationId = ''
+    self.radius = ''
+    self.sortingField = ''
+    self.adType = ''
+    self.posterType = ''
+    self.pageNum = ''
+    self.action = ''
+    self.maxPrice = ''
+    self.minPrice = ''
+
+
+def advanced_search(SearchItem.fields()):
   # implcitly joined string
+  #self.sortingField = 'SORTING_DATE'
+  # self.action = 'find'
+  fields = {'keywords': self.keywords,
+            'categoryId': self.categoryId,
+            'locationStr': self.locationStr,
+            'locationId': self.locationId,
+            'radius': self.radius,
+            'sortingField': self.sortingField,
+            'adType': self.adType,
+            'posterType': self.posterType,
+            'pageNum':self.pageNum,
+            'action': self.action,
+            'maxPrice': self.maxPrice,
+            'minPrice': self.minPrice}
   search_string = ("http://kleinanzeigen.ebay.de/anzeigen/s-suchanfrage.html"
-                   "?keywords={keywords}&categoryId={categoryId}&locationStr=&"
-                   "locationId=0&radius=0&sortingField=SORTING_DATE&adType=&"
-                   "posterType=&pageNum=1&action=find&maxPrice=&minPrice=")
-  return search_string.split('?')[-1].split('&')
+                   "?keywords={keywords}&categoryId={categoryId}&locationStr={locationStr}&"
+                   "locationId={locationId}&radius={radius}&sortingField={sortingField}&adType={adType}&"
+                   "posterType={posterType}&pageNum={pageNum}&action={action}find&"
+                   "maxPrice={maxPrice}&minPrice={minPrice}").format(**self.search_fields)
+  #return search_string.split('?')[-1].split('&')
+  return search_string
 
 
 class Project():
