@@ -4,7 +4,7 @@ import urllib.parse
 
 class Parser():
   def __init__(self):
-    self.standard_fields = {'keywords': "keywords",
+    self.standardFields = {'keywords': "keywords",
                             'categoryId': "categoryId",
                             'locationStr': "locationStr",
                             'locationId': "locationId",
@@ -17,14 +17,14 @@ class Parser():
                             'maxPrice': "maxPrice",
                             'minPrice': "minPrice"}
 
-  def urlGenerator(self, fields=None, base_url=None):
+  def urlGenerator(self, fields=None, baseUrl=None):
     """Takes fields-dict and returns URL string."""
-    if not base_url:
-      base_url = "http://kleinanzeigen.ebay.de/anzeigen/s-suchanfrage.html?"
+    if not baseUrl:
+      baseUrl = "http://kleinanzeigen.ebay.de/anzeigen/s-suchanfrage.html?"
     if not fields:
-      fields = self.standard_fields
+      fields = self.standardFields
 
     data = urllib.parse.urlencode(fields)
-    full_url = base_url + data
+    fullUrl = baseUrl + data
 
-    return full_url
+    return fullUrl

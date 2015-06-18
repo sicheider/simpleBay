@@ -24,14 +24,14 @@ class ParserTests(unittest.TestCase):
     self.parseInstance = Parser()
 
   def testUrlGenerator(self):
-    expected_string = ("http://kleinanzeigen.ebay.de/anzeigen/"
+    expectedString = ("http://kleinanzeigen.ebay.de/anzeigen/"
     "s-suchanfrage.html?keywords=wasser+hahn&categoryId=&locationStr=Berlin&"
                        "locationId=&radius=&sortingField=SORTING_DATE&adType=&"
                        "posterType=&pageNum=1&action=find&maxPrice=&minPrice=")
-    actual_string = self.parseInstance.urlGenerator(self.fields)
+    actualString = self.parseInstance.urlGenerator(self.fields)
     #print("EXP: ", expected_string)
-    print("ACT: ", actual_string)
-    #self.assertTrue(actual_string == expected_string)
+    print("ACT: ", actualString)
+    #self.assertTrue(actualString == expectedString)
 
 
 def main():
