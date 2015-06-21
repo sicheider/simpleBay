@@ -4,21 +4,21 @@ import urllib.parse
 
 class Parser():
   def __init__(self):
-    self.standardFields = {'keywords': "keywords",
-                            'categoryId': "categoryId",
-                            'locationStr': "locationStr",
-                            'locationId': "locationId",
-                            'radius': "radius",
-                            'sortingField': "sortingField",
-                            'adType': "adType",
-                            'posterType': "posterType",
-                            'pageNum': "pageNum",
-                            'action': "action",
-                            'maxPrice': "maxPrice",
-                            'minPrice': "minPrice"}
+    self.standardFields = {'keywords': "TEST",
+                           'categoryId': "",
+                           'locationStr': "",
+                           'locationId': "",
+                           'radius': "",
+                           'sortingField': "SORTING_DATE",
+                           'adType': "",
+                           'posterType': "",
+                           'pageNum': 1,
+                           'action': "find",
+                           'maxPrice': "",
+                           'minPrice': ""}
 
   def urlGenerator(self, fields=None, baseUrl=None):
-    """Takes fields-dict and returns URL string."""
+    """Take fields dictonary and returns URL string."""
     if not baseUrl:
       baseUrl = "http://kleinanzeigen.ebay.de/anzeigen/s-suchanfrage.html?"
     if not fields:

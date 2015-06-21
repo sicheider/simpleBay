@@ -6,7 +6,7 @@ sys.path.insert(0, "..")
 from simpleParser import Parser
 
 
-class ParserTests(unittest.TestCase):
+class UrlGeneratorTests(unittest.TestCase):
   def setUp(self):
     """ Set up test fixture """
     self.fields = {'keywords': "wasser hahn",
@@ -19,19 +19,33 @@ class ParserTests(unittest.TestCase):
                   'posterType': "",
                   'pageNum': 1,
                   'action': "find",
-                  'maxPrice': "",
-                  'minPrice': ""}
+                  'maxPrice': "100",
+                  'minPrice': "30"}
     self.parseInstance = Parser()
 
-  def testUrlGenerator(self):
-    expectedString = ("http://kleinanzeigen.ebay.de/anzeigen/"
-    "s-suchanfrage.html?keywords=wasser+hahn&categoryId=&locationStr=Berlin&"
-                       "locationId=&radius=&sortingField=SORTING_DATE&adType=&"
-                       "posterType=&pageNum=1&action=find&maxPrice=&minPrice=")
+  def testStandardFields(self):
+    expectedTags = ("http://kleinanzeigen.ebay.de/anzeigen/s-suchanfrage.html",
+                    "maxPrice=", "minPrice=", "locationStr=",
+                    "keywords=TEST", "action=find", "pageNum=1",
+                    "sortingField=SORTING_DATE")
+    actualString = self.parseInstance.urlGenerator()
+    print("Actual String:", actualString, "", sep='\n')
+
+    for tag in expectedTags:
+      print(tag, '==>', actualString.find(tag))
+      self.assertTrue(actualString.find(tag) >= 0)
+
+  def testSelfFields(self):
+    expectedTags = ("http://kleinanzeigen.ebay.de/anzeigen/s-suchanfrage.html",
+                    "maxPrice=100", "minPrice=30", "locationStr=Berlin",
+                    "keywords=wasser+hahn", "action=find", "pageNum=1",
+                    "sortingField=SORTING_DATE")
     actualString = self.parseInstance.urlGenerator(self.fields)
-    #print("EXP: ", expected_string)
-    print("ACT: ", actualString)
-    #self.assertTrue(actualString == expectedString)
+    print("Actual String:", actualString, "", sep='\n')
+
+    for tag in expectedTags:
+      print(tag, '==>', actualString.find(tag))
+      self.assertTrue(actualString.find(tag) >= 0)
 
 
 def main():
