@@ -2,7 +2,7 @@
 # coding: utf-8
 #######################
 import unittest, sys
-sys.path.insert(0, "..")
+sys.path.extend([".", ".."])
 from simpleParser import Parser
 
 
@@ -22,30 +22,31 @@ class UrlGeneratorTests(unittest.TestCase):
                   'maxPrice': "100",
                   'minPrice': "30"}
     self.parseInstance = Parser()
+    self.counter = 0
 
-  def testStandardFields(self):
-    expectedTags = ("http://kleinanzeigen.ebay.de/anzeigen/s-suchanfrage.html",
-                    "maxPrice=", "minPrice=", "locationStr=",
-                    "keywords=TEST", "action=find", "pageNum=1",
-                    "sortingField=SORTING_DATE")
-    actualString = self.parseInstance.urlGenerator()
-    print("Actual String:", actualString, "", sep='\n')
+  def testDictToUrlConversion(self):
+    verbose = True
 
-    for tag in expectedTags:
-      print(tag, '==>', actualString.find(tag))
-      self.assertTrue(actualString.find(tag) >= 0)
+    baseUrl = "http://kleinanzeigen.ebay.de/anzeigen/s-suchanfrage.html"
+    tagListOne = ("maxPrice=", "minPrice=", "locationStr=", "keywords=TEST",
+                  "action=find", "pageNum=1","sortingField=SORTING_DATE")
+    tagListTwo = ("maxPrice=100", "minPrice=30", "action=find", "pageNum=1",
+                  "keywords=wasser+hahn", "locationStr=Berlin",
+                  "sortingField=SORTING_DATE")
 
-  def testSelfFields(self):
-    expectedTags = ("http://kleinanzeigen.ebay.de/anzeigen/s-suchanfrage.html",
-                    "maxPrice=100", "minPrice=30", "locationStr=Berlin",
-                    "keywords=wasser+hahn", "action=find", "pageNum=1",
-                    "sortingField=SORTING_DATE")
-    actualString = self.parseInstance.urlGenerator(self.fields)
-    print("Actual String:", actualString, "", sep='\n')
+    for (actualString, tagList) in (
+        (self.parseInstance.urlGenerator(), tagListOne),
+        (self.parseInstance.urlGenerator(self.fields), tagListTwo)):
 
-    for tag in expectedTags:
-      print(tag, '==>', actualString.find(tag))
-      self.assertTrue(actualString.find(tag) >= 0)
+      self.assertTrue(baseUrl in actualString)
+      if verbose:
+        print('\n', "Actual String:", '\n', actualString, '\n', sep='')
+
+      for tag in tagList:
+        self.counter += 1
+        self.assertTrue(tag in actualString)
+        if verbose:
+          print("Counter: ", self.counter, '\t', "==>", tag)
 
 
 def main():
