@@ -33,6 +33,6 @@ class Parser():
   def dictTranslator(self):
       pass
 
-  def getAllAds(self):
+  def getAllAds(self, searchItemDict):
       pass
 

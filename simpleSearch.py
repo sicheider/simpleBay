@@ -217,7 +217,8 @@ class Search():
 
     def syncAds(self):
         #get all ads from ebay
-        self.listTempAds = self.parser.getAllAds()
+        for i in self.listSearchItems:
+            self.listTempAds.extend(self.parser.getAllAds(i.getSearchItemDict))
         #get all new ads and save them in listNewAds
         for i in self.listTempAds:
             if ((i not in self.listMarkedAds) and
