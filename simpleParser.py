@@ -28,3 +28,11 @@ class Parser():
     fullUrl = baseUrl + data
 
     return fullUrl
+
+
+  def dictTranslator(self):
+      pass
+
+  def getAllAds(self):
+      pass
+
