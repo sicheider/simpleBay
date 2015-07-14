@@ -29,10 +29,8 @@ class Parser():
 
     return fullUrl
 
-
   def dictTranslator(self):
       pass
 
   def getAllAds(self, searchItemDict):
       pass
-
