@@ -1,1 +1,1 @@
-from .TestExtractor import TestExtractorIE
+from .testExtractor import TestExtractorIE
