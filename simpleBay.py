@@ -20,6 +20,9 @@ class SimpleBay:
     def getExtractorNames(self):
         return self.extractorNames
 
-    def getSearchResults(self, extratorName, keywords, ammounts):
-        extractor = self._getExtractorByName(extratorName)
-        return extractor.extract(keywords, ammounts)
+    def getSearchResults(self, extractorNames, keywords, ammounts):
+        result = []
+        for extractorName, keyword, ammount in zip(extractorNames, keywords, ammounts):
+            extractor = self._getExtractorByName(extractorName)
+            result += extractor.extract(keyword, ammount)
+        return result

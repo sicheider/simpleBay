@@ -9,7 +9,7 @@ try:
     s._getExtractorByName("TesstExtractor")
 except simpleExceptions.ExtractorNotFoundException:
     print("ExtractorNotFound")
-print(s.getSearchResults("TestExtractor",
+print(s.getSearchResults(["TestExtractor", "TestExtractor"],
                          ["hallo", "welt"],
                          [1, 2]))
 s.getSearchResults("TesstExtractor",
