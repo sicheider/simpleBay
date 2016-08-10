@@ -10,4 +10,5 @@ def genExtractorClasses():
     return allClasses
 
 def genExtractors():
+    print("Generating extractors!")
     return [klass() for klass in genExtractorClasses()]

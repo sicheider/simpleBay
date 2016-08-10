@@ -1,28 +1,27 @@
 import extractors
-import simpleExceptions
+import simpleErrors
 
 class SimpleBay:
-    def __init__(self):
+    def __init__(self, downloadPictures=True):
+        self.downloadPictures = downloadPictures
         self.extractorList = extractors.genExtractors()
-        self._genExtractorNames()
+        self.genExtractorNames()
 
-    def _genExtractorNames(self):
+    def genExtractorNames(self):
         self.extractorNames = []
         for extractor in self.extractorList:
             self.extractorNames.append(extractor.name)
 
-    def _getExtractorByName(self, extractorName):
+    def getExtractorByName(self, extractorName):
         for extractor in self.extractorList:
             if extractor.name == extractorName:
                 return extractor
-        raise simpleExceptions.ExtractorNotFoundError()
-
-    def getExtractorNames(self):
-        return self.extractorNames
+        raise simpleErrors.ExtractorNotFoundError()
 
     def getSearchResults(self, extractorNames, keywords, ammounts):
         result = []
         for extractorName, keyword, ammount in zip(extractorNames, keywords, ammounts):
-            extractor = self._getExtractorByName(extractorName)
+            extractor = self.getExtractorByName(extractorName)
+            extractor.downloadPictures = self.downloadPictures
             result += extractor.extract(keyword, ammount)
         return result
