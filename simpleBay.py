@@ -15,7 +15,7 @@ class SimpleBay:
         for extractor in self.extractorList:
             if extractor.name == extractorName:
                 return extractor
-        raise simpleExceptions.ExtractorNotFoundException()
+        raise simpleExceptions.ExtractorNotFoundError()
 
     def getExtractorNames(self):
         return self.extractorNames

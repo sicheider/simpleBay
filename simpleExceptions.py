@@ -1,2 +1,0 @@
-class ExtractorNotFoundException(Exception):
-    pass
