@@ -25,4 +25,7 @@ class SimpleBay:
             extractor.downloadPictures = self.downloadPictures
             ad = extractor.extract(keyword, ammount)
             result += ad
-        return result
+        if len(result) == 0:
+            raise simpleErrors.NoResultsError
+        else:
+            return result

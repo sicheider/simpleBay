@@ -1,6 +1,10 @@
+#!/usr/bin/python3
+
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 import simpleBay
+import simpleErrors
+
 import re
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -15,21 +19,23 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.responseContent += ("</body>\n" +
                                  "</html>")
 
+    def genErrorContent(self, errorMessage):
+        self.genDocHeader()
+        self.responseContent += "<strong>" + errorMessage + "</strong>"
+        self.genDocBottom()
+
     def genResponseContent(self):
         self.genDocHeader()
-        if len(self.searchResults) == 0:
-            self.responseContent += "<strong>No Search Results</strong>"
-        else:
-            self.responseContent += "<table border=\"1\">\n"
-            for searchResult in self.searchResults:
-                self.responseContent += "<tr>\n"
-                self.responseContent += "<td><img src=\"" + str(searchResult['imgSrc']) + "\"></td>"
-                self.responseContent += ("<td><a href=\"" + str(searchResult['url']) + "\" target=_blank>" +
-                                         str(searchResult['title']) +
-                                         "</a></td>\n")
-                self.responseContent += "<td><strong>" + str(searchResult['price']) + "</strong></td>"
-                self.responseContent += "</tr>\n"
-            self.responseContent += "</table>\n"
+        self.responseContent += "<table border=\"1\">\n"
+        for searchResult in self.searchResults:
+            self.responseContent += "<tr>\n"
+            self.responseContent += "<td><img src=\"" + str(searchResult['imgSrc']) + "\"></td>"
+            self.responseContent += ("<td><a href=\"" + str(searchResult['url']) + "\" target=_blank>" +
+                                     str(searchResult['title']) +
+                                     "</a></td>\n")
+            self.responseContent += "<td><strong>" + str(searchResult['price']) + "</strong></td>"
+            self.responseContent += "</tr>\n"
+        self.responseContent += "</table>\n"
         self.genDocBottom()
             
     def handleCommand(self):
@@ -40,8 +46,13 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             expressions = searchItem.split(",")
             searchTriple = (expressions[0], expressions[1], int(expressions[2]))
             listSearchTriples.append(searchTriple)
-        self.searchResults = sb.getSearchResults(listSearchTriples)
-        self.genResponseContent()
+        try:
+            self.searchResults = sb.getSearchResults(listSearchTriples)
+            self.genResponseContent()
+        except simpleErrors.ExtractorNotFoundError:
+            self.genErrorContent("Invalid input!")
+        except simpleErrors.NoResultsError:
+            self.genErrorContent("No search results!")
 
     def checkValidCommand(self):
         pattern = re.compile("(([0-9A-Za-z])+,([0-9A-Za-z-%])+,[0-9]+;)+(([0-9A-Za-z])+,([0-9A-Za-z-%])+,[0-9]+)")
@@ -54,9 +65,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.command = self.requestline.split(" ")[1].split("/")[1]
         if not self.checkValidCommand():
-            self.genDocHeader()
-            self.responseContent += "<strong>Invalid input!</strong>"
-            self.genDocBottom()
+            self.genErrorContent("Invalid input!")
         else:
             self.handleCommand()
         self.send_response(200)
