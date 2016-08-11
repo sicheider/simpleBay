@@ -18,10 +18,11 @@ class SimpleBay:
                 return extractor
         raise simpleErrors.ExtractorNotFoundError()
 
-    def getSearchResults(self, extractorNames, keywords, ammounts):
+    def getSearchResults(self, listSearchTriples):
         result = []
-        for extractorName, keyword, ammount in zip(extractorNames, keywords, ammounts):
+        for extractorName, keyword, ammount in listSearchTriples:
             extractor = self.getExtractorByName(extractorName)
             extractor.downloadPictures = self.downloadPictures
-            result += extractor.extract(keyword, ammount)
+            ad = extractor.extract(keyword, ammount)
+            result += ad
         return result
