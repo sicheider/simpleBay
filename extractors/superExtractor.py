@@ -10,7 +10,7 @@ class SuperExtractor:
         except FileExistsError:
             pass
 
-    def getPicture(self, url, fileName):
+    def getPictureFromWeb(self, url, fileName):
         r = requests.get(url, stream = True)
         filePath = self.cacheDir + "/" + fileName
         with open(filePath, "wb") as f:
