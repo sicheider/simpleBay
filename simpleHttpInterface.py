@@ -70,7 +70,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 searchTriple = (expressions[0], expressions[1], int(expressions[2]))
                 listSearchTriples.append(searchTriple)
             try:
-                self.searchResults = sb.getSearchResults(listSearchTriples)
+                self.searchResults = self.sb.getSearchResults(listSearchTriples)
                 self.genResponseContent()
             except simpleErrors.ExtractorNotFoundError:
                 self.genErrorContent("Webside not supported!")
