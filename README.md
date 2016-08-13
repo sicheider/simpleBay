@@ -11,4 +11,4 @@ Install the dependencies. You can install all python packages with pip. Clone/co
 
 #Usage
 Start the simpleHttpInterface.py script with python3.
-Open http://localhost:9000/[webside1],[keyword1],[ammount1];[webside2],[keyword2],[ammount2];... in your browser.
+Open http://localhost:9000/[webside1],[keyword1],[ammount1];[webside2],[keyword2],[ammount2];... in your browser (default IP-adress and port).

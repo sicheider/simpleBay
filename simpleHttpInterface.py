@@ -30,6 +30,17 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.responseContent += "<strong>" + errorMessage + "</strong>"
         self.genDocBottom()
 
+    def genStartDoc(self):
+        self.genDocHeader()
+        self.responseContent += ("<strong>Supported websides:</strong>\n" +
+                                 "<ul>\n")
+        for extractorName in self.sb.extractorNames:
+            self.responseContent += "<li>" + extractorName + "</li>\n"
+        self.responseContent += "</ul>\n"
+        self.responseContent += ("<strong>Append /[webside1],[keyword1],[ammount1];" +
+                                 "[webside2],[keyword2],[ammount2];... to your url line!")
+        self.genDocBottom()
+
     def genResponseContent(self):
         self.genDocHeader()
         self.responseContent += "<table>\n"
@@ -47,24 +58,27 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.genDocBottom()
             
     def handleCommand(self):
-        sb = simpleBay.SimpleBay(downloadPictures=False)
+        self.sb = simpleBay.SimpleBay(downloadPictures=False)
         searchItems = self.command.split(";")
         searchItems.pop()
-        listSearchTriples = []
-        for searchItem in searchItems:
-            expressions = searchItem.split(",")
-            searchTriple = (expressions[0], expressions[1], int(expressions[2]))
-            listSearchTriples.append(searchTriple)
-        try:
-            self.searchResults = sb.getSearchResults(listSearchTriples)
-            self.genResponseContent()
-        except simpleErrors.ExtractorNotFoundError:
-            self.genErrorContent("Webside not supported!")
-        except simpleErrors.NoResultsError:
-            self.genErrorContent("No search results!")
+        if len(searchItems) == 0:
+            self.genStartDoc()
+        else:
+            listSearchTriples = []
+            for searchItem in searchItems:
+                expressions = searchItem.split(",")
+                searchTriple = (expressions[0], expressions[1], int(expressions[2]))
+                listSearchTriples.append(searchTriple)
+            try:
+                self.searchResults = sb.getSearchResults(listSearchTriples)
+                self.genResponseContent()
+            except simpleErrors.ExtractorNotFoundError:
+                self.genErrorContent("Webside not supported!")
+            except simpleErrors.NoResultsError:
+                self.genErrorContent("No search results!")
 
     def checkValidCommand(self):
-        pattern = re.compile("^((([0-9A-Za-z])+,([0-9A-Za-z-%])+,[0-9]+;)+)$")
+        pattern = re.compile("^((([0-9A-Za-z])+,([0-9A-Za-z-%])+,[0-9]+;)+)$|")
         result = pattern.match(self.command)
         if result == None:
             self.genErrorContent("Invalid input!")
