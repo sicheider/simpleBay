@@ -37,21 +37,22 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         for extractorName in self.sb.extractorNames:
             self.responseContent += "<li>" + extractorName + "</li>\n"
         self.responseContent += "</ul>\n"
-        self.responseContent += ("<strong>Append /[webside1],[keyword1],[ammount1];" +
-                                 "[webside2],[keyword2],[ammount2];... to your url line!")
+        self.responseContent += ("<strong>Append /[keyword1],[ammount1];" +
+                                 "[keyword2],[ammount2];... to your url line!")
         self.genDocBottom()
 
     def genResponseContent(self):
         self.genDocHeader()
         self.responseContent += "<table>\n"
         self.responseContent += "<tr>\n"
-        self.responseContent += "<th>Picture</th><th>Description</th><th>Price</th>\n"
+        self.responseContent += "<th>Picture</th><th>Description</th><th>Date</th><th>Price</th>\n"
         for searchResult in self.searchResults:
             self.responseContent += "<tr>\n"
             self.responseContent += "<td><img src=\"" + str(searchResult['imgSrc']) + "\"></td>"
             self.responseContent += ("<td><a href=\"" + str(searchResult['url']) + "\" target=_blank>" +
                                      str(searchResult['title']) +
                                      "</a></td>\n")
+            self.responseContent += "<td>" + searchResult['date'].strftime("%A, %d %B %H:%M") + "</td>"
             self.responseContent += "<td><strong>" + str(searchResult['price']) + "</strong></td>"
             self.responseContent += "</tr>\n"
         self.responseContent += "</table>\n"
@@ -64,21 +65,19 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         if len(searchItems) == 0:
             self.genStartDoc()
         else:
-            listSearchTriples = []
+            listSearchTouples = []
             for searchItem in searchItems:
                 expressions = searchItem.split(",")
-                searchTriple = (expressions[0], expressions[1], int(expressions[2]))
-                listSearchTriples.append(searchTriple)
+                searchTouple = (expressions[0], int(expressions[1]))
+                listSearchTouples.append(searchTouple)
             try:
-                self.searchResults = self.sb.getSearchResults(listSearchTriples)
+                self.searchResults = self.sb.getSearchResults(listSearchTouples)
                 self.genResponseContent()
-            except simpleErrors.ExtractorNotFoundError:
-                self.genErrorContent("Webside not supported!")
             except simpleErrors.NoResultsError:
                 self.genErrorContent("No search results!")
 
     def checkValidCommand(self):
-        pattern = re.compile("^((([0-9A-Za-z])+,([0-9A-Za-z-%])+,[0-9]+;)+)$|")
+        pattern = re.compile("^((([0-9A-Za-z-%])+,[0-9]+;)+)$|")
         result = pattern.match(self.command)
         if result == None:
             self.genErrorContent("Invalid input!")

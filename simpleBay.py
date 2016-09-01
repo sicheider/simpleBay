@@ -1,9 +1,11 @@
 import extractors
 import simpleErrors
+from operator import itemgetter
 
 class SimpleBay:
-    def __init__(self, downloadPictures=True):
+    def __init__(self, downloadPictures=True, sort="date"):
         self.downloadPictures = downloadPictures
+        self.sort = sort
         self.extractorList = extractors.genExtractors()
         self.genExtractorNames()
 
@@ -12,20 +14,17 @@ class SimpleBay:
         for extractor in self.extractorList:
             self.extractorNames.append(extractor.name)
 
-    def getExtractorByName(self, extractorName):
-        for extractor in self.extractorList:
-            if extractor.name == extractorName:
-                return extractor
-        raise simpleErrors.ExtractorNotFoundError()
-
-    def getSearchResults(self, listSearchTriples):
+    def getSearchResults(self, listSearchTouples):
         result = []
-        for extractorName, keyword, ammount in listSearchTriples:
-            extractor = self.getExtractorByName(extractorName)
-            extractor.downloadPictures = self.downloadPictures
-            ad = extractor.extract(keyword, ammount, self.downloadPictures)
-            result += ad
+        for extractor in self.extractorList:
+            for keyword, ammount in listSearchTouples:
+                extractor.downloadPictures = self.downloadPictures
+                ad = extractor.extract(keyword, ammount, self.downloadPictures)
+                result += ad
         if len(result) == 0:
             raise simpleErrors.NoResultsError
         else:
-            return result
+            if self.sort == "date":
+                return sorted(result, key=itemgetter("date"), reverse=True)
+            else:
+                return result
