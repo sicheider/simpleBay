@@ -104,7 +104,7 @@ class SimpleHTTPInterface:
     def run(self):
         print("Http interface server started!")
         print("Open http://" + self.hostIP + ":" + str(self.hostPort) +
-                "/[webside],[keyword],[ammount];... in your browser")
+                "/[keyword],[ammount];... in your browser")
         try:
             self.server.serve_forever()
         except KeyboardInterrupt:
