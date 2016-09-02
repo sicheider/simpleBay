@@ -77,7 +77,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 self.genErrorContent("No search results!")
 
     def checkValidCommand(self):
-        pattern = re.compile("^((([0-9A-Za-z-%])+,[0-9]+;)+)$|")
+        pattern = re.compile("^((([0-9A-Za-z-%])+,[0-9]+;)+)?$|")
         result = pattern.match(self.command)
         if result == None:
             self.genErrorContent("Invalid input!")
