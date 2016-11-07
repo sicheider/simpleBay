@@ -94,7 +94,8 @@ class SecretExtractorIE(SuperExtractor):
                                    'extractor' : self.name,
                                    'imgPath' : imgPath,
                                    'date' : date,
-                                   'keywordID' : self.keywordID})
+                                   'keywordID' : self.keywordID,
+                                   'keyword' : self.keyword})
                     self.extractedAds.append(url)
                     if len(self.extractedAds) == self.ammount:
                         return result
@@ -114,6 +115,7 @@ class SecretExtractorIE(SuperExtractor):
         self.extractedAds = []
         self.ammount = ammount
         self.keywordID = keywordID
+        self.keyword = keyword
         pageCount = ammount // self.itemsPerSide
         if pageCount == 0:
             pageCount = 1

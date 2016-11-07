@@ -35,7 +35,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.genDocHeader()
         self.responseContent += "<table>\n"
         self.responseContent += "<tr>\n"
-        self.responseContent += "<th>Picture</th><th>Description</th><th>Date</th><th>Price</th>"
+        self.responseContent += "<th>Picture</th><th>Description</th><th>Date</th><th>Original keyword</th><th>Price</th>"
         self.responseContent += "<th>Average price</th><th>Listings</th><th>Sellthrough</th>\n"
         self.responseContent += "</tr>\n"
         for searchResult in self.searchResults:
@@ -45,16 +45,17 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                                      str(searchResult['title']) +
                                      "</a></td>\n")
             self.responseContent += "<td>" + searchResult['date'].strftime("%A, %d %B %H:%M") + "</td>"
+            self.responseContent += "<td>" + searchResult['keyword'].replace("%20", " ") + "</td>"
             self.responseContent += "<td><strong>" + str(searchResult['price']) + "</strong></td>"
             self.responseContent += "<td>" + self.averagePrices[searchResult['keywordID'] - 1] + "</td>"
-            self.responseContent += "<td>" + str(self.listingsCount[searchResult['keywordID'] - 1]) + "</td>"
+            self.responseContent += "<td>" + self.listingsCount[searchResult['keywordID'] - 1] + "</td>"
             self.responseContent += "<td>" + self.sellThroughs[searchResult['keywordID'] - 1] + "</td>"
             self.responseContent += "</tr>\n"
         self.responseContent += "</table>\n"
         self.genDocBottom()
 
     def getListSearchTouplesFromFile(self):
-        searchfile = get_data("simpleBaySuchbegriffe.ods")
+        searchfile = get_data("Suchbegriffe.ods")
         sheet1 = searchfile["Sheet1"]
         listSearchTouples = []
         sheet1.pop(0)
@@ -69,9 +70,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             model.replace(" ", "%20")
             keyword = company + "%20" + model
             ammount = int(row[3])
-            averagePrice = str(row[5])
-            listingCount = int(row[7])
-            sellThrough = str(row[8])
+            averagePrice = str(row[6])
+            listingCount = str(row[8])
+            sellThrough = str(row[9])
             listSearchTouples.append((keyword, ammount, keywordID))
             self.averagePrices.append(averagePrice)
             self.listingsCount.append(listingCount)
