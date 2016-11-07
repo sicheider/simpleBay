@@ -1,4 +1,4 @@
 try:
-    from .ebaykleinanzeigenExtractor import EbaykleinanzeigenExtractorIE
+    from .secretExtractor import SecretExtractorIE
 except ImportError:
     pass

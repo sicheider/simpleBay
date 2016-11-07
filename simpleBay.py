@@ -17,12 +17,12 @@ class SimpleBay:
     def getSearchResults(self, listSearchTouples):
         result = []
         print("Searching for:")
-        for keyword, ammount in listSearchTouples:
-            print("Keyword: " + keyword.replace("%20", " ") + "\t\tAmmount: " + str(ammount))
+        for keyword, ammount, keywordID in listSearchTouples:
+            print("Keyword: " + keyword.replace("%20", " ") + "\t\t\t\tAmmount: " + str(ammount))
         for extractor in self.extractorList:
-            for keyword, ammount in listSearchTouples:
+            for keyword, ammount, keywordID in listSearchTouples:
                 extractor.downloadPictures = self.downloadPictures
-                ad = extractor.extract(keyword, ammount, self.downloadPictures)
+                ad = extractor.extract(keyword, ammount, keywordID, self.downloadPictures)
                 result += ad
         if len(result) == 0:
             raise simpleErrors.NoResultsError

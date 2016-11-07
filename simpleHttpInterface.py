@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
+from pyexcel_ods3 import get_data
 
 import simpleBay
 import simpleErrors
@@ -30,22 +31,13 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.responseContent += "<strong>" + errorMessage + "</strong>"
         self.genDocBottom()
 
-    def genStartDoc(self):
-        self.genDocHeader()
-        self.responseContent += ("<strong>Supported websides:</strong>\n" +
-                                 "<ul>\n")
-        for extractorName in self.sb.extractorNames:
-            self.responseContent += "<li>" + extractorName + "</li>\n"
-        self.responseContent += "</ul>\n"
-        self.responseContent += ("<strong>Append /[keyword1],[ammount1];" +
-                                 "[keyword2],[ammount2];... to your url line!")
-        self.genDocBottom()
-
     def genResponseContent(self):
         self.genDocHeader()
         self.responseContent += "<table>\n"
         self.responseContent += "<tr>\n"
-        self.responseContent += "<th>Picture</th><th>Description</th><th>Date</th><th>Price</th>\n"
+        self.responseContent += "<th>Picture</th><th>Description</th><th>Date</th><th>Price</th>"
+        self.responseContent += "<th>Average price</th><th>Listings</th><th>Sellthrough</th>\n"
+        self.responseContent += "</tr>\n"
         for searchResult in self.searchResults:
             self.responseContent += "<tr>\n"
             self.responseContent += "<td><img src=\"" + str(searchResult['imgSrc']) + "\"></td>"
@@ -54,45 +46,56 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                                      "</a></td>\n")
             self.responseContent += "<td>" + searchResult['date'].strftime("%A, %d %B %H:%M") + "</td>"
             self.responseContent += "<td><strong>" + str(searchResult['price']) + "</strong></td>"
+            self.responseContent += "<td>" + self.averagePrices[searchResult['keywordID'] - 1] + "</td>"
+            self.responseContent += "<td>" + str(self.listingsCount[searchResult['keywordID'] - 1]) + "</td>"
+            self.responseContent += "<td>" + self.sellThroughs[searchResult['keywordID'] - 1] + "</td>"
             self.responseContent += "</tr>\n"
         self.responseContent += "</table>\n"
         self.genDocBottom()
-            
+
+    def getListSearchTouplesFromFile(self):
+        searchfile = get_data("simpleBaySuchbegriffe.ods")
+        sheet1 = searchfile["Sheet1"]
+        listSearchTouples = []
+        sheet1.pop(0)
+        self.averagePrices = []
+        self.listingsCount = []
+        self.sellThroughs = []
+        for row in sheet1:
+            keywordID = int(row[0])
+            company = str(row[1])
+            company.replace(" ", "%20")
+            model = str(row[2])
+            model.replace(" ", "%20")
+            keyword = company + "%20" + model
+            ammount = int(row[3])
+            averagePrice = str(row[5])
+            listingCount = int(row[7])
+            sellThrough = str(row[8])
+            listSearchTouples.append((keyword, ammount, keywordID))
+            self.averagePrices.append(averagePrice)
+            self.listingsCount.append(listingCount)
+            self.sellThroughs.append(sellThrough)
+        return listSearchTouples
+                    
     def handleCommand(self):
         self.sb = simpleBay.SimpleBay(downloadPictures=False)
-        searchItems = self.command.split(";")
-        searchItems.pop()
-        if len(searchItems) == 0:
-            self.genStartDoc()
-        else:
-            listSearchTouples = []
-            for searchItem in searchItems:
-                expressions = searchItem.split(",")
-                searchTouple = (expressions[0], int(expressions[1]))
-                listSearchTouples.append(searchTouple)
-            try:
-                self.searchResults = self.sb.getSearchResults(listSearchTouples)
-                self.genResponseContent()
-            except simpleErrors.NoResultsError:
-                self.genErrorContent("No search results!")
-
-    def checkValidCommand(self):
-        pattern = re.compile("^((([0-9A-Za-z-%])+,[0-9]+;)+)?$|")
-        result = pattern.match(self.command)
-        if result == None:
-            self.genErrorContent("Invalid input!")
-            return False
-        else:
-            return True
+        try:
+            listSearchTouples = self.getListSearchTouplesFromFile()
+            self.searchResults = self.sb.getSearchResults(listSearchTouples)
+            self.genResponseContent()
+        except simpleErrors.NoResultsError:
+            self.genErrorContent("No search results!")
+        except IndexError:
+            self.genErrorContent("Invalid input file!")
 
     def do_GET(self):
-        self.command = self.requestline.split(" ")[1].split("/")[1]
-        if self.checkValidCommand():
+        if not "favicon" in self.requestline:
             self.handleCommand()
-        self.send_response(200)
-        self.send_header("Content-type", "text/html; charset=utf-8")
-        self.end_headers()
-        self.wfile.write(bytes(self.responseContent, "UTF-8"))
+            self.send_response(200)
+            self.send_header("Content-type", "text/html; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(bytes(self.responseContent, "UTF-8"))
 
 class SimpleHTTPInterface:
     def __init__(self, hostIP="localhost", hostPort=9000):
@@ -103,8 +106,7 @@ class SimpleHTTPInterface:
 
     def run(self):
         print("Http interface server started!")
-        print("Open http://" + self.hostIP + ":" + str(self.hostPort) +
-                "/[keyword],[ammount];... in your browser")
+        print("Open http://" + self.hostIP + ":" + str(self.hostPort) + " in your browser")
         try:
             self.server.serve_forever()
         except KeyboardInterrupt:

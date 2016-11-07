@@ -1,5 +1,6 @@
 Cache/
-ebaykleinanzeigenExtractor.py
+secretfile.txt
+*.ods
 
 # Temp files:
 .*.sw[p,o]
