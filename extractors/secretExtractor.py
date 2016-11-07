@@ -13,18 +13,26 @@ class SecretExtractorIE(SuperExtractor):
         self.checkCache()
 
     def getInfoFromSecretFile(self):
-        secretfile = open("secretfile.txt", "r")
-        info = secretfile.read().splitlines()
-        self.name = info[0]
-        self.baseUrl = info[1]
+        try:
+            secretfile = open("secretfile.txt", "r")
+            info = secretfile.read().splitlines()
+            self.name = info[0]
+            self.baseUrl = info[1]
+            self.sideSplitter = info[2]
+            self.urlEnding = info[3]
+            secretfile.close()
+        except IOError:
+            print("Secretfile not found!")
+        except IndexError:
+            print("Invalid secretfile!")
 
     def genUrl(self, keyword, sideNumber):
         result = (self.baseUrl +
-                "/s-seite:" +
+                self.sideSplitter +
                 str(sideNumber) +
                 "/" +
                 keyword +
-                "/k0")
+                self.urlEnding)
         print("Opening " + result + "!")
         return result
 
@@ -91,10 +99,8 @@ class SecretExtractorIE(SuperExtractor):
                     if len(self.extractedAds) == self.ammount:
                         return result
             except KeyError as e:
-                print(str(e))
                 continue
             except IndexError as e:
-                print(str(e))
                 continue
         return result
 

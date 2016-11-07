@@ -1,6 +1,7 @@
 Cache/
 secretfile.txt
 *.ods
+*.ods#
 
 # Temp files:
 .*.sw[p,o]
