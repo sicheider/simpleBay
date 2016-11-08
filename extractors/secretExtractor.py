@@ -76,7 +76,14 @@ class SecretExtractorIE(SuperExtractor):
                 url = self.baseUrl + div['data-href']
                 imgSrc = div['data-imgsrc']
                 title = div['data-imgtitle']
-                price = article.contents[5].contents[1].string
+                try:
+                    price = (article.contents[5].contents[1].string.replace(" ", "")
+                        .replace("VB", "").replace("€", "").replace(".", "").replace("\n", ""))
+                    price = int(price)
+                except ValueError:
+                    price = 1
+                except AttributeError:
+                    price = 1
                 date = article.contents[7].contents[0].string
                 if date == "\n":
                     continue

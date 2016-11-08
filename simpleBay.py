@@ -18,7 +18,7 @@ class SimpleBay:
         result = []
         print("Searching for:")
         for keyword, ammount, keywordID in listSearchTouples:
-            print("Keyword: " + keyword.replace("%20", " ") + "\t\t\t\tAmmount: " + str(ammount))
+            print("Keyword: " + keyword.replace("%20", " "))
         for extractor in self.extractorList:
             for keyword, ammount, keywordID in listSearchTouples:
                 extractor.downloadPictures = self.downloadPictures

@@ -31,12 +31,22 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.responseContent += "<strong>" + errorMessage + "</strong>"
         self.genDocBottom()
 
+    def addAverageInfoToSearchResults(self):
+        for searchResult in self.searchResults:
+            searchResult['averagePrice'] = self.averagePrices[searchResult['keywordID'] - 1]
+            searchResult['listingCount'] = self.listingsCount[searchResult['keywordID'] - 1]
+            searchResult['sellThrough'] = self.sellThroughs[searchResult['keywordID'] - 1]
+
+    def addProfitToSearchResults(self):
+        for searchResult in self.searchResults:
+            searchResult['profit'] = searchResult['averagePrice'] - searchResult['price']
+
     def genResponseContent(self):
         self.genDocHeader()
         self.responseContent += "<table>\n"
         self.responseContent += "<tr>\n"
-        self.responseContent += "<th>Picture</th><th>Description</th><th>Date</th><th>Original keyword</th><th>Price</th>"
-        self.responseContent += "<th>Average price</th><th>Listings</th><th>Sellthrough</th>\n"
+        self.responseContent += "<th>Picture</th><th>Description</th><th>Price</th><th>Average price</th>"
+        self.responseContent += "<th>Original keyword</th><th>Profit</th><th>Listings</th><th>Sellthrough</th><th>Date</th>\n"
         self.responseContent += "</tr>\n"
         for searchResult in self.searchResults:
             self.responseContent += "<tr>\n"
@@ -44,12 +54,16 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.responseContent += ("<td><a href=\"" + str(searchResult['url']) + "\" target=_blank>" +
                                      str(searchResult['title']) +
                                      "</a></td>\n")
-            self.responseContent += "<td>" + searchResult['date'].strftime("%A, %d %B %H:%M") + "</td>"
+            self.responseContent += "<td>" + str(searchResult['price']) + "€" + "</td>"
+            self.responseContent += "<td>" + str(searchResult['averagePrice']) + "€" + "</td>"
             self.responseContent += "<td>" + searchResult['keyword'].replace("%20", " ") + "</td>"
-            self.responseContent += "<td><strong>" + str(searchResult['price']) + "</strong></td>"
-            self.responseContent += "<td>" + self.averagePrices[searchResult['keywordID'] - 1] + "</td>"
-            self.responseContent += "<td>" + self.listingsCount[searchResult['keywordID'] - 1] + "</td>"
-            self.responseContent += "<td>" + self.sellThroughs[searchResult['keywordID'] - 1] + "</td>"
+            if searchResult['profit'] >= 0:
+                self.responseContent += "<td><strong><font color=\"green\">" + "%.2f" % searchResult['profit'] + "€" + "</font></strong></td>"
+            else:
+                self.responseContent += "<td><strong><font color=\"red\">" + "%.2f" % searchResult['profit'] + "€" + "</font></strong></td>"
+            self.responseContent += "<td>" + searchResult['listingCount'] + "</td>"
+            self.responseContent += "<td>" + searchResult['sellThrough'] + "</td>"
+            self.responseContent += "<td>" + searchResult['date'].strftime("%d.%m.%y %H:%M") + "</td>"
             self.responseContent += "</tr>\n"
         self.responseContent += "</table>\n"
         self.genDocBottom()
@@ -70,7 +84,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             model.replace(" ", "%20")
             keyword = company + "%20" + model
             ammount = int(row[3])
-            averagePrice = str(row[6])
+            averagePrice = float(row[6].replace("€", ""))
             listingCount = str(row[8])
             sellThrough = str(row[9])
             listSearchTouples.append((keyword, ammount, keywordID))
@@ -84,6 +98,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         try:
             listSearchTouples = self.getListSearchTouplesFromFile()
             self.searchResults = self.sb.getSearchResults(listSearchTouples)
+            self.addAverageInfoToSearchResults()
+            self.addProfitToSearchResults()
             self.genResponseContent()
         except simpleErrors.NoResultsError:
             self.genErrorContent("No search results!")
