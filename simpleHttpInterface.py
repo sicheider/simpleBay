@@ -41,6 +41,29 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         for searchResult in self.searchResults:
             searchResult['profit'] = searchResult['averagePrice'] - searchResult['price']
 
+    def filterNonKeywordsFromSearchResults(self):
+        for searchResult in self.searchResults:
+            for nonKeyword in self.listNonKeywords:
+                if nonKeyword.lower() in searchResult['title'].lower():
+                    self.searchResults.remove(searchResult)
+
+    def filterAlreadyShownArticles(self):
+        run = True
+        while run:
+            listUrls = []
+            found = False
+            run = False
+            for searchResult in self.searchResults:
+                for url in listUrls:
+                    if searchResult['url'] == url:
+                        found = True
+                        run = True
+                if found:
+                    self.searchResults.remove(searchResult)
+                else:
+                    listUrls.append(searchResult['url'])
+                found = False
+
     def genResponseContent(self):
         self.genDocHeader()
         self.responseContent += "<table>\n"
@@ -68,8 +91,17 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.responseContent += "</table>\n"
         self.genDocBottom()
 
-    def getListSearchTouplesFromFile(self):
-        searchfile = get_data("Suchbegriffe.ods")
+    def getListNonKeywords(self, searchFileName):
+        searchFile = get_data(searchFileName)
+        sheet2 = searchFile["Sheet2"]
+        sheet2.pop(0)
+        result = []
+        for row in sheet2:
+            result.append(row[0])
+        return result
+
+    def getListSearchTouplesFromFile(self, searchFileName):
+        searchfile = get_data(searchFileName)
         sheet1 = searchfile["Sheet1"]
         listSearchTouples = []
         sheet1.pop(0)
@@ -96,8 +128,11 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def handleCommand(self):
         self.sb = simpleBay.SimpleBay(downloadPictures=False)
         try:
-            listSearchTouples = self.getListSearchTouplesFromFile()
+            listSearchTouples = self.getListSearchTouplesFromFile("Suchbegriffe.ods")
+            self.listNonKeywords = self.getListNonKeywords("Suchbegriffe.ods")
             self.searchResults = self.sb.getSearchResults(listSearchTouples)
+            self.filterNonKeywordsFromSearchResults()
+            self.filterAlreadyShownArticles()
             self.addAverageInfoToSearchResults()
             self.addProfitToSearchResults()
             self.genResponseContent()
