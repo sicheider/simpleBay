@@ -41,29 +41,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         for searchResult in self.searchResults:
             searchResult['profit'] = searchResult['averagePrice'] - searchResult['price']
 
-    def filterNonKeywordsFromSearchResults(self):
-        for searchResult in self.searchResults:
-            for nonKeyword in self.listNonKeywords:
-                if nonKeyword.lower() in searchResult['title'].lower():
-                    self.searchResults.remove(searchResult)
-
-    def filterAlreadyShownArticles(self):
-        run = True
-        while run:
-            listUrls = []
-            found = False
-            run = False
-            for searchResult in self.searchResults:
-                for url in listUrls:
-                    if searchResult['url'] == url:
-                        found = True
-                        run = True
-                if found:
-                    self.searchResults.remove(searchResult)
-                else:
-                    listUrls.append(searchResult['url'])
-                found = False
-
     def genResponseContent(self):
         self.genDocHeader()
         self.responseContent += "<table>\n"
@@ -126,13 +103,11 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         return listSearchTouples
                     
     def handleCommand(self):
-        self.sb = simpleBay.SimpleBay(downloadPictures=False)
         try:
             listSearchTouples = self.getListSearchTouplesFromFile("Suchbegriffe.ods")
-            self.listNonKeywords = self.getListNonKeywords("Suchbegriffe.ods")
+            listNonKeywords = self.getListNonKeywords("Suchbegriffe.ods")
+            self.sb = simpleBay.SimpleBay(listNonKeywords, downloadPictures=False)
             self.searchResults = self.sb.getSearchResults(listSearchTouples)
-            self.filterNonKeywordsFromSearchResults()
-            self.filterAlreadyShownArticles()
             self.addAverageInfoToSearchResults()
             self.addProfitToSearchResults()
             self.genResponseContent()

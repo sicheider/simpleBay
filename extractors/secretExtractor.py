@@ -118,6 +118,7 @@ class SecretExtractorIE(SuperExtractor):
         return name + ext
 
     def extract(self, keyword, ammount, keywordID, downloadPictures):
+        self.downloadPictures = downloadPictures
         result = []
         self.extractedAds = []
         self.ammount = ammount

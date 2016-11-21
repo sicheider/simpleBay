@@ -3,9 +3,16 @@ import simpleErrors
 from operator import itemgetter
 
 class SimpleBay:
-    def __init__(self, downloadPictures=True, sort="date"):
+    def __init__(self, listNonKeywords,
+            downloadPictures = True,
+            sort= "date",
+            filterNonKeywords = True,
+            filterDoubleArticles = True):
         self.downloadPictures = downloadPictures
         self.sort = sort
+        self.filterNonKeywords = filterNonKeywords
+        self.filterDoubleArticles = filterDoubleArticles
+        self.listNonKeywords = listNonKeywords
         self.extractorList = extractors.genExtractors()
         self.genExtractorNames()
 
@@ -21,13 +28,50 @@ class SimpleBay:
             print("Keyword: " + keyword.replace("%20", " "))
         for extractor in self.extractorList:
             for keyword, ammount, keywordID in listSearchTouples:
-                extractor.downloadPictures = self.downloadPictures
                 ad = extractor.extract(keyword, ammount, keywordID, self.downloadPictures)
                 result += ad
         if len(result) == 0:
             raise simpleErrors.NoResultsError
+        result = self.filterResult(result)
+        result = self.sortResult(result)
+        return result
+        
+    def sortResult(self, searchResults):
+        if self.sort == "date":
+            return sorted(searchResults, key=itemgetter("date"), reverse = True)
+        if self.sort == "price":
+            return sorted(searchResults, key=itemgetter("price"), reverse = True)
         else:
-            if self.sort == "date":
-                return sorted(result, key=itemgetter("date"), reverse=True)
-            else:
-                return result
+            return searchResults
+
+    def filterResult(self, searchResults):
+        if self.filterNonKeywords:
+            run = True
+            while run:
+                run = False
+                for searchResult in searchResults:
+                    for nonKeyword in self.listNonKeywords:
+                        if nonKeyword.lower() in searchResult["title"].lower():
+                            try:
+                                searchResults.remove(searchResult)
+                                run = True
+                            except ValueError:
+                                continue
+
+        if self.filterDoubleArticles:
+            run = True
+            while run:
+                listUrls = []
+                found = False
+                run = False
+                for searchResult in searchResults:
+                    for url in listUrls:
+                        if searchResult["url"] == url:
+                            found = True
+                            run = True
+                    if found:
+                        searchResults.remove(searchResult)
+                    else:
+                        listUrls.append(searchResult["url"])
+                    found = False
+        return searchResults
