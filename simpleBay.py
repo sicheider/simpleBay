@@ -45,19 +45,6 @@ class SimpleBay:
             return searchResults
 
     def filterResult(self, searchResults):
-        if self.filterNonKeywords:
-            run = True
-            while run:
-                run = False
-                for searchResult in searchResults:
-                    for nonKeyword in self.listNonKeywords:
-                        if nonKeyword.lower() in searchResult["title"].lower():
-                            try:
-                                searchResults.remove(searchResult)
-                                run = True
-                            except ValueError:
-                                continue
-
         if self.filterDoubleArticles:
             run = True
             while run:
@@ -74,4 +61,17 @@ class SimpleBay:
                     else:
                         listUrls.append(searchResult["url"])
                     found = False
+
+        if self.filterNonKeywords:
+            run = True
+            while run:
+                run = False
+                for searchResult in searchResults:
+                    for nonKeyword in self.listNonKeywords:
+                        if nonKeyword.lower() in searchResult["title"].lower():
+                            try:
+                                searchResults.remove(searchResult)
+                                run = True
+                            except ValueError:
+                                continue
         return searchResults
